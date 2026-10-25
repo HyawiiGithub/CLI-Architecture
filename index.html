@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Convio — CLI architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050505;
+    --panel: #0a0a0a;
+    --panel-2: #0d0d0d;
+    --border: #232323;
+    --border-soft: #1a1a1a;
+    --line: #333333;
+    --line-strong: #4a4a4a;
+    --text: #f2f2f2;
+    --muted: #9a9a9a;
+    --faint: #737373;
+    --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Fragment Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--bg); }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: min(1080px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 76px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+  }
+
+  .logo span {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -.01em;
+  }
+
+  .top-meta {
+    color: var(--faint);
+    font: 10px/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  main { padding: 84px 0 88px; }
+
+  .intro {
+    max-width: 680px;
+    margin: 0 auto 60px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 18px;
+    color: var(--faint);
+    font: 10px/1 var(--mono);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(40px, 6vw, 62px);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -.045em;
+  }
+
+  .lede {
+    max-width: 540px;
+    margin: 18px auto 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .diagram {
+    width: min(880px, 100%);
+    margin: 0 auto;
+  }
+
+  .node {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+  }
+
+  .node-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .num {
+    color: var(--faint);
+    font: 10px/1 var(--mono);
+  }
+
+  .label {
+    color: var(--faint);
+    font: 9.5px/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .node h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+  }
+
+  .node h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -.015em;
+  }
+
+  .node p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+
+  .command {
+    margin: 16px 0 0;
+    padding: 10px 12px;
+    overflow-x: auto;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    background: var(--panel-2);
+    color: var(--text);
+    font: 11.5px/1.5 var(--mono);
+  }
+
+  .command .prompt-char { color: var(--faint); }
+
+  .meta {
+    margin-top: 12px;
+    color: var(--faint);
+    font: 10.5px/1.6 var(--mono);
+  }
+
+  .prompt {
+    margin: 18px 0 0;
+    padding-left: 14px;
+    border-left: 1px solid var(--line-strong);
+  }
+
+  .prompt-label {
+    color: var(--muted);
+    font: 9.5px/1.4 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .prompt code {
+    display: block;
+    margin-top: 6px;
+    color: var(--text);
+    font: 11.5px/1.6 var(--mono);
+  }
+
+  .facts {
+    display: grid;
+    margin: 18px 0 0;
+  }
+
+  .facts > div {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .facts dt {
+    color: var(--faint);
+    font: 9.5px/1.5 var(--mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .facts dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .node-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-soft);
+    color: var(--faint);
+    font: 10px/1.5 var(--mono);
+  }
+
+  .connector {
+    position: relative;
+    height: 62px;
+  }
+
+  .connector::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 8px;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .connector::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-top: 6px solid var(--line-strong);
+  }
+
+  .connector span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    max-width: 84%;
+    padding: 2px 8px;
+    transform: translate(-50%, -50%);
+    background: var(--bg);
+    color: var(--faint);
+    font: 10px/1.5 var(--mono);
+    text-align: center;
+  }
+
+  .network {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+  }
+
+  .network-head { display: block; }
+
+  .inner {
+    margin-top: 18px;
+  }
+
+  .inner-node {
+    padding: 16px 18px;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    background: var(--panel-2);
+  }
+
+  .inner-label {
+    margin-bottom: 8px;
+    color: var(--faint);
+    font: 9.5px/1.4 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .inner-node p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .mini-connector {
+    position: relative;
+    height: 50px;
+  }
+
+  .mini-connector::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 8px;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .mini-connector::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-top: 6px solid var(--line-strong);
+  }
+
+  .mini-connector span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    padding: 2px 8px;
+    transform: translate(-50%, -50%);
+    background: var(--panel);
+    color: var(--faint);
+    font: 9.5px/1.5 var(--mono);
+    text-align: center;
+  }
+
+  .fork {
+    position: relative;
+    padding-top: 24px;
+  }
+
+  .fork::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 24px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .fork::after {
+    content: "";
+    position: absolute;
+    top: 23px;
+    right: 25%;
+    left: 25%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .fork-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .fork-col {
+    position: relative;
+    padding-top: 18px;
+    min-width: 0;
+  }
+
+  .fork-col::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 12px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .fork-col::after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-top: 6px solid var(--line-strong);
+  }
+
+  .stack {
+    width: min(880px, 100%);
+    margin: 64px auto 0;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .stack-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .stack-head h2 {
+    margin: 0;
+    color: var(--muted);
+    font: 10px/1 var(--mono);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .stack-head span {
+    color: var(--faint);
+    font: 10px/1 var(--mono);
+  }
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 56px;
+  }
+
+  .stack dl { margin: 0; }
+
+  .stack dl > div {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .stack dl > div:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .stack dt {
+    color: var(--faint);
+    font: 9.5px/1.5 var(--mono);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .stack dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .notes {
+    display: grid;
+    gap: 6px;
+    width: min(880px, 100%);
+    margin: 28px auto 0;
+    color: var(--faint);
+    font: 10.5px/1.6 var(--mono);
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 28px 0 36px;
+    border-top: 1px solid var(--border);
+    color: var(--faint);
+    font: 10px/1.4 var(--mono);
+  }
+
+  @media (max-width: 700px) {
+    .page { width: calc(100% - 32px); }
+
+    header { height: 68px; }
+
+    main { padding: 56px 0 72px; }
+
+    .intro {
+      margin-bottom: 44px;
+      padding-top: 12px;
+    }
+
+    h1 { font-size: 40px; }
+
+    .top-meta { display: none; }
+
+    .node,
+    .network {
+      padding: 20px;
+    }
+
+    .facts > div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+
+    .fork { padding-top: 22px; }
+
+    .fork::before { height: 16px; }
+
+    .fork::after {
+      top: 15px;
+      right: auto;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      background: transparent;
+      border-top: 6px solid var(--line-strong);
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+    }
+
+    .fork-cols {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .fork-col { padding-top: 0; }
+
+    .fork-col::before,
+    .fork-col::after { display: none; }
+
+    .stack {
+      margin-top: 48px;
+    }
+
+    .stack-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .stack dl + dl {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .stack dl + dl > div:first-child {
+      padding-top: 8px;
+      border-top: 1px solid var(--border-soft);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <a class="logo" href="https://convio.dev/" aria-label="Convio">
+      <svg viewBox="0 0 41 41" fill="currentColor" aria-hidden="true">
+        <path transform="translate(0 3.359)" d="M 20.486 0 C 19.745 0 19 0.147 18.3 0.439 L 3.039 6.75 C 2.18 7.105 2.202 8.301 3.06 8.656 L 18.404 14.734 C 19.748 15.279 21.252 15.279 22.596 14.734 L 37.94 8.656 C 38.8 8.321 38.8 7.105 37.961 6.75 L 22.659 0.439 C 21.972 0.148 21.233 -0.001 20.486 0 Z M 39.975 10.404 C 39.845 10.405 39.716 10.431 39.596 10.481 L 22.492 17.104 C 22.101 17.264 21.844 17.644 21.843 18.067 L 21.843 33.265 C 21.846 33.602 22.015 33.917 22.296 34.105 C 22.576 34.294 22.931 34.332 23.245 34.208 L 40.351 27.562 C 40.744 27.416 41.003 27.04 41 26.621 L 41 11.424 C 40.996 10.86 40.538 10.405 39.975 10.405 Z M 1.155 10.47 C 0.848 10.459 0.551 10.577 0.335 10.795 C 0.147 10.985 0 11.214 0 11.487 L 0 25.76 C 0 26.515 0.88 27.019 1.551 26.682 L 12.262 21.547 L 12.787 21.296 L 17.859 18.843 C 18.655 18.467 18.593 17.292 17.755 16.977 L 1.508 10.544 C 1.396 10.497 1.276 10.471 1.155 10.469 Z"/>
+      </svg>
+      <span>Convio</span>
+    </a>
+    <span class="top-meta">CLI architecture · v1</span>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p class="eyebrow">Architecture</p>
+      <h1>How the CLI connects</h1>
+      <p class="lede">
+        A thin command-line client with a build-time system prompt and a single
+        HTTPS connection into Convio's private tool network.
+      </p>
+    </section>
+
+    <section class="diagram" aria-label="Convio CLI architecture">
+
+      <article class="node">
+        <div class="node-top">
+          <span class="num">01</span>
+          <span class="label">Origin</span>
+        </div>
+        <h2>User</h2>
+        <p>Terminal, CI job, or script.</p>
+        <pre class="command"><span class="prompt-char">$</span> convio run &lt;tool&gt; --arg …</pre>
+      </article>
+
+      <div class="connector" aria-hidden="true"><span>argv · stdin · env</span></div>
+
+      <article class="node">
+        <div class="node-top">
+          <span class="num">02</span>
+          <span class="label">Client</span>
+        </div>
+        <h2>Convio CLI</h2>
+        <p>Node.js 22 LTS · TypeScript · oclif / Commander</p>
+
+        <div class="prompt">
+          <div class="prompt-label">System prompt · baked in</div>
+          <code>prompt.md → build constant · signed · versioned · never fetched</code>
+        </div>
+
+        <dl class="facts">
+          <div><dt>Router</dt><dd>login · run · tools · config · doctor</dd></div>
+          <div><dt>MCP client</dt><dd>JSON-RPC 2.0 · initialize / tools.list / tools.call</dd></div>
+          <div><dt>Transport</dt><dd>Streamable HTTP + SSE · undici · retries</dd></div>
+          <div><dt>Config</dt><dd>~/.convio/config.json · Zod</dd></div>
+        </dl>
+
+        <div class="node-foot">
+          <span>single egress → mcp.convio.dev</span>
+          <span>no direct arequest access</span>
+        </div>
+      </article>
+
+      <div class="connector" aria-hidden="true"><span>HTTPS 443 · TLS 1.3 · OAuth 2.1/PKCE</span></div>
+
+      <article class="node">
+        <div class="node-top">
+          <span class="num">03</span>
+          <span class="label">Edge</span>
+        </div>
+        <h2>mcp.convio.dev</h2>
+        <p>Public MCP endpoint and edge gateway.</p>
+        <div class="meta">TLS termination · OAuth 2.1/PKCE · WAF · rate limit · request signing</div>
+      </article>
+
+      <div class="connector" aria-hidden="true"><span>private link</span></div>
+
+      <article class="node">
+        <div class="node-top">
+          <span class="num">04</span>
+          <span class="label">Control plane</span>
+        </div>
+        <h2>Convio Server</h2>
+        <p>Session, policy, routing, and audit.</p>
+        <div class="meta">session · MCP router · policy engine · audit log · quotas</div>
+      </article>
+
+      <div class="connector" aria-hidden="true"><span>mTLS · service mesh</span></div>
+
+      <section class="network" aria-label="Convio internal closed network">
+        <div class="network-head">
+          <div class="node-top">
+            <span class="num">05</span>
+            <span class="label">Private boundary</span>
+          </div>
+          <h2>Convio internal closed network</h2>
+          <p>Private VPC · zero public ingress · mTLS service mesh</p>
+        </div>
+
+        <div class="inner">
+          <article class="inner-node">
+            <div class="inner-label">Internal gateway</div>
+            <h3>arequest.convio.dev</h3>
+            <p>authn/z · schema validation · tracing</p>
+          </article>
+
+          <div class="mini-connector" aria-hidden="true"><span>resolve tool</span></div>
+
+          <article class="inner-node">
+            <div class="inner-label">Registry + resolver</div>
+            <h3>CTS · Convio Skills &amp; Tool Search</h3>
+            <p>tool registry · metadata index · resolver · version pins</p>
+          </article>
+
+          <div class="fork">
+            <div class="fork-cols">
+              <div class="fork-col">
+                <article class="inner-node">
+                  <div class="inner-label">Data · accounts</div>
+                  <h3>Account Pool</h3>
+                  <p>credential vault · leases · rotation</p>
+                </article>
+              </div>
+              <div class="fork-col">
+                <article class="inner-node">
+                  <div class="inner-label">Data · skills</div>
+                  <h3>Skill Library</h3>
+                  <p>packages · manifests · signed artifacts</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="stack">
+      <div class="stack-head">
+        <h2>Stack</h2>
+        <span>suggested</span>
+      </div>
+      <div class="stack-grid">
+        <dl>
+          <div><dt>Runtime</dt><dd>Node 22 LTS · TypeScript · oclif</dd></div>
+          <div><dt>Protocol</dt><dd>MCP · JSON-RPC 2.0</dd></div>
+          <div><dt>Transport</dt><dd>Streamable HTTP + SSE · undici</dd></div>
+          <div><dt>Auth</dt><dd>OAuth 2.1 + PKCE · short-lived tokens</dd></div>
+        </dl>
+        <dl>
+          <div><dt>Edge</dt><dd>Kong / Envoy · WAF · rate limit</dd></div>
+          <div><dt>Control</dt><dd>policy engine · audit · quotas</dd></div>
+          <div><dt>Internal</dt><dd>mTLS · service mesh · private VPC</dd></div>
+          <div><dt>Registry</dt><dd>CTS · metadata index · version pins</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="notes">
+      <p>No client-side model or inference. The baked-in prompt is a build artifact.</p>
+    </div>
+  </main>
+
+  <footer>
+    <span>Convio · CLI architecture</span>
+    <span>v1 · static diagram</span>
+  </footer>
+</div>
+</body>
+</html>

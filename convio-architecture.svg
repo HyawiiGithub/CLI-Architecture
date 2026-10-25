@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 1600" width="1680" height="1600" role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">Convio CLI and MCP architecture</title>
+  <desc id="diagramDesc">Proposed Convio CLI plane alongside the current hosted MCP path, converging at mcp.convio.dev and flowing through the Convio Server, internal closed network, arequest broker, and the CTS skills and tool search layer into the account pool and skill library.</desc>
+
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="0%" r="95%">
+      <stop offset="0%" stop-color="#0e1730"/>
+      <stop offset="55%" stop-color="#0a1020"/>
+      <stop offset="100%" stop-color="#070b15"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.022"/>
+    </pattern>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+    <marker id="a-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#2ee6c5"/>
+    </marker>
+    <marker id="a-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#a78bfa"/>
+    </marker>
+    <marker id="a-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#fbbf24"/>
+    </marker>
+    <marker id="a-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#fb7185"/>
+    </marker>
+    <marker id="a-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#5f7194"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif; }
+    .title { font-size: 30px; font-weight: 700; fill: #eef3ff; letter-spacing: -0.4px; }
+    .sub { font-size: 13.5px; fill: #8b9bb8; }
+    .h { font-size: 19px; font-weight: 600; fill: #eaf0fb; letter-spacing: -0.2px; }
+    .h2 { font-size: 14px; font-weight: 600; fill: #dfe8f7; }
+    .sub2 { font-size: 11px; fill: #8593ad; }
+    .li { font-size: 12px; fill: #b9c6dd; }
+    .small { font-size: 11px; fill: #8b9bb8; }
+    .micro { font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; }
+    .mono { font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; }
+    .box { fill: #111a2e; stroke: #26344f; stroke-width: 1.5; }
+    .new { stroke: #2ee6c5; stroke-opacity: 0.5; }
+    .cur { stroke: #a78bfa; stroke-opacity: 0.5; }
+    .shared { stroke: #fbbf24; stroke-opacity: 0.42; }
+    .internal { fill: #0f1626; stroke: #fb7185; stroke-opacity: 0.32; }
+    .badge { font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; }
+    .flow { fill: none; stroke-width: 2; }
+    .faint { fill: none; stroke-width: 1.6; stroke-dasharray: 6 6; }
+  </style>
+
+  <rect width="1680" height="1600" fill="url(#bg)"/>
+  <rect width="1680" height="1600" fill="url(#grid)"/>
+
+  <text class="title" x="110" y="66">Convio Platform — CLI + MCP Architecture</text>
+  <text class="sub" x="110" y="95">Proposed CLI plane with an embedded system prompt, alongside the current hosted MCP path — both converge on one edge gateway and backend.</text>
+
+  <circle cx="1303" cy="58" r="5" fill="#2ee6c5"/>
+  <text class="small" x="1316" y="62">Proposed — CLI plane</text>
+  <circle cx="1303" cy="84" r="5" fill="#a78bfa"/>
+  <text class="small" x="1316" y="88">Current — hosted MCP path</text>
+
+  <!-- ============ USERS ============ -->
+  <rect class="box new" x="110" y="140" width="520" height="96" rx="14" filter="url(#soft)"/>
+  <rect x="110" y="140" width="520" height="4" rx="2" fill="#2ee6c5" opacity="0.75"/>
+  <text class="h" x="134" y="176">User / Developer</text>
+  <text class="sub2" x="134" y="198">Terminal · IDE · local repository</text>
+  <text class="li" x="134" y="218">Runs `convio` and chats with tools in-repo</text>
+
+  <rect class="box cur" x="1050" y="140" width="520" height="96" rx="14" filter="url(#soft)"/>
+  <rect x="1050" y="140" width="520" height="4" rx="2" fill="#a78bfa" opacity="0.75"/>
+  <text class="h" x="1074" y="176">User / Agent Host</text>
+  <text class="sub2" x="1074" y="198">Claude Desktop · Cursor · VS Code · Copilot</text>
+  <text class="li" x="1074" y="218">An existing MCP client with no local Convio runtime</text>
+
+  <!-- ============ CLI ============ -->
+  <rect class="box new" x="110" y="300" width="520" height="215" rx="16" filter="url(#soft)"/>
+  <rect x="110" y="300" width="520" height="4" rx="2" fill="#2ee6c5" opacity="0.9"/>
+  <text class="h" x="134" y="336">Convio CLI</text>
+  <text class="sub2 mono" x="134" y="355">npx @convio/cli · Node 20 + TypeScript · single binary</text>
+  <rect x="518" y="316" width="96" height="20" rx="6" fill="#2ee6c5" fill-opacity="0.12" stroke="#2ee6c5" stroke-opacity="0.4"/>
+  <text class="badge" x="566" y="330" fill="#2ee6c5" text-anchor="middle">PROPOSED</text>
+
+  <rect x="132" y="369" width="476" height="26" rx="7" fill="#2ee6c5" fill-opacity="0.1" stroke="#2ee6c5" stroke-opacity="0.3"/>
+  <text class="li" x="146" y="386" fill="#d6fff7">System prompt — embedded, signed &amp; versioned</text>
+
+  <circle cx="140" cy="403" r="2.2" fill="#2ee6c5"/>
+  <text class="li" x="152" y="407">Tool contracts — Zod schemas, typed MCP calls</text>
+  <circle cx="140" cy="425" r="2.2" fill="#2ee6c5"/>
+  <text class="li" x="152" y="429">Context assembler — repo, git diff, env, history</text>
+  <circle cx="140" cy="447" r="2.2" fill="#2ee6c5"/>
+  <text class="li" x="152" y="451">MCP client — @modelcontextprotocol/sdk</text>
+  <circle cx="140" cy="469" r="2.2" fill="#2ee6c5"/>
+  <text class="li" x="152" y="473">Auth — OAuth 2.1 + PKCE · OS keychain</text>
+  <circle cx="140" cy="491" r="2.2" fill="#2ee6c5"/>
+  <text class="li" x="152" y="495">Cache — tool catalog + skill manifests</text>
+
+  <!-- ============ HOSTED HOST ============ -->
+  <rect class="box cur" x="1050" y="300" width="520" height="215" rx="16" filter="url(#soft)"/>
+  <rect x="1050" y="300" width="520" height="4" rx="2" fill="#a78bfa" opacity="0.9"/>
+  <text class="h" x="1074" y="336">MCP Client Runtime</text>
+  <text class="sub2" x="1074" y="355">Host-owned agent loop · no embedded Convio prompt</text>
+  <rect x="1458" y="316" width="94" height="20" rx="6" fill="#a78bfa" fill-opacity="0.12" stroke="#a78bfa" stroke-opacity="0.4"/>
+  <text class="badge" x="1505" y="330" fill="#a78bfa" text-anchor="middle">CURRENT</text>
+
+  <rect x="1072" y="369" width="476" height="26" rx="7" fill="#a78bfa" fill-opacity="0.1" stroke="#a78bfa" stroke-opacity="0.3"/>
+  <text class="li" x="1086" y="386" fill="#ede7ff">System prompt — generated by Convio CLI</text>
+
+  <circle cx="1080" cy="403" r="2.2" fill="#a78bfa"/>
+  <text class="li" x="1092" y="407">MCP client — Streamable HTTP + SSE</text>
+  <circle cx="1080" cy="425" r="2.2" fill="#a78bfa"/>
+  <text class="li" x="1092" y="429">Endpoint — mcp.convio.dev</text>
+  <circle cx="1080" cy="447" r="2.2" fill="#a78bfa"/>
+  <text class="li" x="1092" y="451">Tools — discovered at runtime (tools/list)</text>
+  <circle cx="1080" cy="469" r="2.2" fill="#a78bfa"/>
+  <text class="li" x="1092" y="473">Auth — OAuth token from `convio login`</text>
+  <circle cx="1080" cy="491" r="2.2" fill="#a78bfa"/>
+  <text class="li" x="1092" y="495">Fallback — SSE transport when required</text>
+
+  <!-- optional stdio bridge -->
+  <path class="faint" d="M630 430H1050" stroke="#5f7194" marker-start="url(#a-muted)" marker-end="url(#a-muted)"/>
+  <rect x="706" y="405" width="272" height="20" rx="6" fill="#0b1220" opacity="0.9"/>
+  <text class="small" x="842" y="419" text-anchor="middle">optional: `convio mcp serve` stdio bridge</text>
+
+  <!-- ============ TOP FLOWS ============ -->
+  <path class="flow" d="M370 236V300" stroke="#2ee6c5" marker-end="url(#a-teal)"/>
+  <text class="small" x="386" y="274">prompt, code, repo context</text>
+
+  <path class="flow" d="M1310 236V300" stroke="#a78bfa" marker-end="url(#a-purple)"/>
+  <text class="small" x="1326" y="274">chat + tool requests</text>
+
+  <!-- CLI -> MCP -->
+  <path class="flow" d="M370 515V540Q370 562 392 562H698Q720 562 720 580" stroke="#2ee6c5" marker-end="url(#a-teal)"/>
+  <text class="small" x="402" y="552">HTTPS · JSON-RPC 2.0 · MCP Streamable HTTP + SSE</text>
+
+  <!-- Host -> MCP -->
+  <path class="flow" d="M1310 515V540Q1310 562 1288 562H982Q960 562 960 580" stroke="#a78bfa" marker-end="url(#a-purple)"/>
+  <text class="small" x="1278" y="552" text-anchor="end">Streamable HTTP / SSE · OAuth 2.1</text>
+
+  <!-- ============ MCP EDGE ============ -->
+  <rect class="box shared" x="600" y="580" width="480" height="150" rx="16" filter="url(#soft)"/>
+  <rect x="600" y="580" width="480" height="4" rx="2" fill="#fbbf24" opacity="0.9"/>
+  <text class="h mono" x="624" y="616">mcp.convio.dev</text>
+  <text class="sub2" x="624" y="635">Edge MCP gateway · public surface</text>
+  <rect x="972" y="596" width="92" height="20" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-opacity="0.4"/>
+  <text class="badge" x="1018" y="610" fill="#fbbf24" text-anchor="middle">SHARED</text>
+
+  <circle cx="612" cy="656" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="624" y="660">Cloudflare Workers + Hono · MCP TypeScript SDK</text>
+  <circle cx="612" cy="678" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="624" y="682">OAuth 2.1 / JWT verification · rate limiting</text>
+  <circle cx="612" cy="700" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="624" y="704">tools/list · tools/call → Convio Server</text>
+
+  <!-- ============ CONVIO SERVER ============ -->
+  <path class="flow" d="M840 730V800" stroke="#fbbf24" marker-end="url(#a-amber)"/>
+  <text class="small" x="858" y="772">MCP JSON-RPC → internal API</text>
+
+  <rect class="box shared" x="590" y="800" width="500" height="140" rx="16" filter="url(#soft)"/>
+  <rect x="590" y="800" width="500" height="4" rx="2" fill="#fbbf24" opacity="0.9"/>
+  <text class="h" x="614" y="836">Convio Server</text>
+  <text class="sub2" x="614" y="855">Orchestration, policy &amp; routing</text>
+  <rect x="976" y="814" width="94" height="20" rx="6" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-opacity="0.4"/>
+  <text class="badge" x="1023" y="828" fill="#fbbf24" text-anchor="middle">SHARED</text>
+
+  <circle cx="602" cy="876" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="614" y="880">Node/Go services · Postgres metadata · Redis queues</text>
+  <circle cx="602" cy="898" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="614" y="902">Policy engine — scopes, entitlements, quotas</text>
+  <circle cx="602" cy="920" r="2.2" fill="#fbbf24"/>
+  <text class="li" x="614" y="924">Tool router — fan-out to CTS and skill runners</text>
+
+  <!-- ============ INTERNAL NETWORK ============ -->
+  <rect x="340" y="975" width="1000" height="570" rx="22" fill="#fb7185" fill-opacity="0.025" stroke="#fb7185" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="7 7"/>
+  <text class="micro" x="364" y="1006" fill="#fb7185" fill-opacity="0.85">CONVIO INTERNAL CLOSED NETWORK</text>
+  <text class="small" x="1316" y="1006" fill="#8b7a8f" text-anchor="end">mTLS · signed · allowlisted</text>
+
+  <path class="flow" d="M840 940V1040" stroke="#fb7185" marker-end="url(#a-rose)"/>
+  <text class="small" x="858" y="1000">signed internal request</text>
+
+  <rect class="box internal" x="560" y="1040" width="560" height="120" rx="14" filter="url(#soft)"/>
+  <text class="h mono" x="584" y="1074">arequest.convio.dev</text>
+  <text class="sub2" x="584" y="1094">Internal request broker · gRPC</text>
+  <circle cx="572" cy="1114" r="2.2" fill="#fb7185"/>
+  <text class="li" x="584" y="1118">mTLS + request signing · egress allowlist</text>
+  <circle cx="572" cy="1136" r="2.2" fill="#fb7185"/>
+  <text class="li" x="584" y="1140">Normalizes tool calls → CTS retrieval queries</text>
+
+  <path class="flow" d="M840 1160V1220" stroke="#fb7185" marker-end="url(#a-rose)"/>
+  <text class="small" x="858" y="1196">tool / skill query</text>
+
+  <rect class="box internal" x="540" y="1220" width="600" height="140" rx="14" filter="url(#soft)"/>
+  <rect x="540" y="1220" width="600" height="4" rx="2" fill="#fb7185" opacity="0.6"/>
+  <text class="h" x="564" y="1256">Convio Skills &amp; Tool Search (CTS)</text>
+  <text class="sub2" x="564" y="1276">Hybrid retrieval, ranking &amp; evaluation</text>
+  <circle cx="552" cy="1296" r="2.2" fill="#fb7185"/>
+  <text class="li" x="564" y="1300">BM25 + vector search — pgvector / OpenSearch</text>
+  <circle cx="552" cy="1318" r="2.2" fill="#fb7185"/>
+  <text class="li" x="564" y="1322">Skill registry — manifests, versions, eval scores</text>
+  <circle cx="552" cy="1340" r="2.2" fill="#fb7185"/>
+  <text class="li" x="564" y="1344">Returns ranked tools &amp; skills to the caller</text>
+
+  <path class="flow" d="M840 1360V1390H580V1420" stroke="#fb7185" marker-end="url(#a-rose)"/>
+  <path class="flow" d="M840 1390H1100V1420" stroke="#fb7185" marker-end="url(#a-rose)"/>
+
+  <rect class="box internal" x="400" y="1420" width="360" height="100" rx="12" filter="url(#soft)"/>
+  <text class="h2" x="420" y="1450">Account Pool</text>
+  <text class="sub2" x="420" y="1468">KMS-backed credential vault</text>
+  <circle cx="412" cy="1484" r="2.2" fill="#fb7185"/>
+  <text class="li" x="424" y="1488">Per-tenant creds · rotation · quotas</text>
+  <circle cx="412" cy="1503" r="2.2" fill="#fb7185"/>
+  <text class="li" x="424" y="1507">Scoped tokens for skill execution</text>
+
+  <rect class="box internal" x="920" y="1420" width="360" height="100" rx="12" filter="url(#soft)"/>
+  <text class="h2" x="940" y="1450">Skill Library</text>
+  <text class="sub2" x="940" y="1468">Versioned skill registry</text>
+  <circle cx="932" cy="1484" r="2.2" fill="#fb7185"/>
+  <text class="li" x="944" y="1488">Versioned skill packages</text>
+  <circle cx="932" cy="1503" r="2.2" fill="#fb7185"/>
+  <text class="li" x="944" y="1507">Object storage · signed artifacts · evals</text>
+
+  <text class="small" x="110" y="1585" fill="#63718c">Transport: TLS 1.3 · JSON-RPC 2.0 · MCP Streamable HTTP (+SSE fallback) · OAuth 2.1 + PKCE</text>
+  <text class="small" x="1570" y="1585" fill="#63718c" text-anchor="end">Internal: zero-trust · mTLS · signed requests · no public egress</text>
+</svg>
